@@ -199,10 +199,10 @@ class DaliaAI:
 
 
 if __name__ == '__main__':
-    api_key = '46IMpJMZkMeHSoB8loOISbKWhG3UakLkRj0l7EeEkG0EkmwqpNm8ZVqVjL3SQtTE'
-    api_secret = 'aE6KgaRQJxW0rW4303QxHfuTyHF3Vp9xxzy3hMWun4fjZtpsBCYyHri3xjbnPVjV'
-    symbol = 'GALA/BUSD'
-    budget = 0
+    api_key = 'KEY'
+    api_secret = 'SECRET'
+    symbol = 'SYMBOL'
+    budget = 500
 
     bot = DaliaAI(api_key, api_secret, symbol, budget)
     bot.run_bot()
