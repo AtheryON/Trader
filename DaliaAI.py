@@ -22,11 +22,12 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 class DaliaAI:
-    def __init__(self, api_key, api_secret, symbol, budget, interval='1d'):
+    def __init__(self, api_key, api_secret, symbol, budget, interval='5m'):
         self.api_key = api_key
         self.api_secret = api_secret
         self.symbol = symbol
         self.interval = interval
+        self.limit = 4500
         self.exchange = ccxt.binance({
             'apiKey': api_key,
             'secret': api_secret
@@ -50,14 +51,13 @@ class DaliaAI:
 
     def retrieve_data(self):
         try:
-            self.data = pd.DataFrame(self.exchange.fetch_ohlcv(self.symbol, self.interval))
+            self.data = pd.DataFrame(self.exchange.fetch_ohlcv(self.symbol, self.interval, self.limit))
             self.data.columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
             self.data.set_index('timestamp', inplace=True)
             logger.info(f"Successfully retrieved market data \n {self.data}")
         except Exception as e:
             logger.error(f"Error while retrieving market data: {e}")
             raise
-
 
     def calculate_indicators(self):
         try:
@@ -77,7 +77,6 @@ class DaliaAI:
             logger.error(f"Error while calculating indicators: {e}")
             raise
 
-
     def decide(self):
         try:
             if len(self.data) < 2:
@@ -96,15 +95,18 @@ class DaliaAI:
             if self.data['action'].iloc[-1] == 1:
                 self.amount = self.amount / self.data['close'].iloc[-1]
                 logger.info(f"Bought {self.amount} at {self.data['close'].iloc[-1]}")
+                print(f"Bought {self.amount} at {self.data['close'].iloc[-1]}")
             elif self.data['action'].iloc[-1] == -1:
                 self.amount = self.amount * self.data['close'].iloc[-1]
                 self.profit = self.amount - self.budget
                 logger.info(f"Sold {self.amount} at {self.data['close'].iloc[-1]}")
+                print(f"Sold {self.amount} at {self.data['close'].iloc[-1]}")
+            logger.info(f"Action taken: {self.data['action'].iloc[-1]}")
+            print(f"Action taken: {self.data['action'].iloc[-1]}")
             logger.info("Successfully executed trade")
         except Exception as e:
             logger.error(f"Error while executing trade: {e}")
             raise
-
 
     def train_model(self):
         X = self.data[['close', 'ma50', 'ma200', 'bb_upper', 'bb_lower', 'rsi', 'macd', 'macd_signal', 'macd_hist']]
@@ -199,9 +201,9 @@ class DaliaAI:
 
 
 if __name__ == '__main__':
-    api_key = 'KEY'
-    api_secret = 'SECRET'
-    symbol = 'SYMBOL'
+    api_key = 'key'
+    api_secret = 'secret'
+    symbol = 'ETH/USDT'
     budget = 500
 
     bot = DaliaAI(api_key, api_secret, symbol, budget)
