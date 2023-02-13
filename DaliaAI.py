@@ -95,14 +95,11 @@ class DaliaAI:
             if self.data['action'].iloc[-1] == 1:
                 self.amount = self.amount / self.data['close'].iloc[-1]
                 logger.info(f"Bought {self.amount} at {self.data['close'].iloc[-1]}")
-                print(f"Bought {self.amount} at {self.data['close'].iloc[-1]}")
             elif self.data['action'].iloc[-1] == -1:
                 self.amount = self.amount * self.data['close'].iloc[-1]
                 self.profit = self.amount - self.budget
                 logger.info(f"Sold {self.amount} at {self.data['close'].iloc[-1]}")
-                print(f"Sold {self.amount} at {self.data['close'].iloc[-1]}")
             logger.info(f"Action taken: {self.data['action'].iloc[-1]}")
-            print(f"Action taken: {self.data['action'].iloc[-1]}")
             logger.info("Successfully executed trade")
         except Exception as e:
             logger.error(f"Error while executing trade: {e}")
